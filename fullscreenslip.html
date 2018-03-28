@@ -1,0 +1,111 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>hello</title>
+<style type="text/css">
+html,body{
+height:100%;
+padding:0px 0px 0px 0px;
+margin:0px 0px 0px 0px;
+
+}
+</style>
+<script type="text/javascript">
+var divArray = [];
+var stepNumber = 30;
+var isfirefox = navigator.userAgent.toUpperCase().indexOf("FIREFOX") > 0?true:false;
+var setbodymousewheel = function(func){
+    if(isfirefox == true){
+	    if(func == null)
+		    document.body.removeEventListener("DOMMouseScroll", scrollfunc);
+		else
+	        document.body.addEventListener("DOMMouseScroll", func);
+	}else{
+	    document.body.onmousewheel = func;
+	}
+};
+var scrollfunc = function(e){
+    var scroll_direction = 0;
+	if(isfirefox){
+	    if(e.detail > 0){
+	        scroll_direction = 1;
+		}else if(e.detail < 0){
+	        scroll_direction = 2;
+		}
+	}else{
+        e = window.event || e;
+	    if(e.wheelDelta < 0)
+	        scroll_direction = 1;
+	    else if (e.wheelDelta > 0)
+	        scroll_direction = 2;
+	}
+	//alert('wheel');
+    if(scroll_direction == 1){
+	    var cur_div_index = -1;
+		for(var i=1;i<divArray.length;i++){
+			if(document.body.scrollTop < divArray[i].offsetTop){
+				cur_div_index = i - 1;
+				break;
+			}
+		}
+		if(cur_div_index != -1){
+			setbodymousewheel(null);
+			var curtop = divArray[cur_div_index].offsetTop;
+			var stepLength = Math.floor(divArray[cur_div_index].offsetHeight / stepNumber);
+			cur_div_index ++;
+			var valid = window.setInterval(function(){
+			   curtop += stepLength;
+			   if(curtop>=divArray[cur_div_index].offsetTop){
+				  window.clearInterval(valid);
+				  window.scrollTo(0,divArray[cur_div_index].offsetTop);
+				  setbodymousewheel(scrollfunc);
+			   }else{
+				  window.scrollTo(0,curtop);
+			   }
+			},10);
+		}
+	}else if(scroll_direction == 2){
+	    var cur_div_index = -1;
+		for(var i=divArray.length - 1;i >= 0;i--){
+			if(document.body.scrollTop > divArray[i].offsetTop){
+				cur_div_index = i + 1;
+				break;
+			}
+		}
+		if(cur_div_index != -1){
+			setbodymousewheel(null);
+			var curtop = divArray[cur_div_index].offsetTop;
+			var stepLength = Math.floor(divArray[cur_div_index].offsetHeight / stepNumber);
+			cur_div_index --;
+			var valid = window.setInterval(function(){
+			   curtop -= stepLength;
+			   if(curtop<=divArray[cur_div_index].offsetTop){
+				  window.clearInterval(valid);
+				  window.scrollTo(0,divArray[cur_div_index].offsetTop);		      
+				  setbodymousewheel(scrollfunc);
+			   }else{
+				  window.scrollTo(0,curtop);
+			   }
+			},10);
+		}
+	}
+};
+window.onload = function(e){
+    divArray.push(document.getElementById('div1'));
+    divArray.push(document.getElementById('div2'));
+    divArray.push(document.getElementById('div3'));
+    divArray.push(document.getElementById('div4'));
+    setbodymousewheel(scrollfunc);
+};
+window.onbeforeunload = function(){
+	window.scrollTo(0,0);
+};
+</script>
+</head>
+<body style="overflow-y:hidden">
+<div id="div1" style="height:100%;background-color:lightgreen"></div>
+<div id="div2" style="height:100%;background-color:lightblue"></div>
+<div id="div3" style="height:100%;background-color:lightyellow"></div>
+<div id="div4" style="height:100%;background-color:lightgray"></div>
+</body>
+</html>
